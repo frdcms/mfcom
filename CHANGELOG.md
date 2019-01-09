@@ -1,47 +1,44 @@
-<a name=""></a>
-# (unreleased)
+<a name="unreleased"></a>
+## [Unreleased]
 
+### Feat
+- add home to plugins.list --json output
+- introduce new autorestart plugin
+- refactor node plugins build
+- remove virtualenv sources after .plugin install
 
-### Bug Fixes
+### Fix
+- fix building issue with empty node plugins
+- fix list metwork processes feature for dev usage (several modules as the same user)
 
-* fix building issue with empty node plugins ([2ce7eb1](https://github.com/metwork-framework/mfcom/commit/2ce7eb1))
-* fix crontab exception in a basic docker container ([ff54e2c](https://github.com/metwork-framework/mfcom/commit/ff54e2c)), closes [#55](https://github.com/metwork-framework/mfcom/issues/55)
-* fix incomplete plugins removal (in some cases) ([cffe11c](https://github.com/metwork-framework/mfcom/commit/cffe11c)), closes [#49](https://github.com/metwork-framework/mfcom/issues/49)
-* fix list metwork processes feature for dev usage (several modules ([9d41327](https://github.com/metwork-framework/mfcom/commit/9d41327))
-* fix metwork processes list ([d7390f4](https://github.com/metwork-framework/mfcom/commit/d7390f4))
-* fix missing postinstall scripts ([b92b2ba](https://github.com/metwork-framework/mfcom/commit/b92b2ba))
-* raise some timeouts for timeout problems on slow machines ([7fd3515](https://github.com/metwork-framework/mfcom/commit/7fd3515)), closes [#46](https://github.com/metwork-framework/mfcom/issues/46)
-* remove a debug message during some plugin operations ([d79ff6e](https://github.com/metwork-framework/mfcom/commit/d79ff6e))
-* remove a debug message in plugin_wrapper util ([ce9da6d](https://github.com/metwork-framework/mfcom/commit/ce9da6d))
-* rollback on plugin packaging around virtualenv ([077616b](https://github.com/metwork-framework/mfcom/commit/077616b)), closes [metwork-framework/mfserv#41](https://github.com/metwork-framework/mfserv/issues/41)
+<a name="v0.4.0"></a>
+## [v0.4.0] - 2019-01-08
+### Feat
+- Add a "plugin succesfully created message" at the end of bootstrap_plugin.py
+- add a list_metwork_processes util
+- add a no-input option
+- add a telegraf plugin to collect informations about metwork modules/plugins
+- add get_file_size function in synutil_lua
+- add new layerapi2 python wrapper
+- better plugin build
+- better plugin cleaning (again)
+- better plugin management (with errors in pre/post scripts)
+- new plugin_wrapper (with options)
+- publish conf generation time as an env var
 
+### Fix
+- fix crontab exception in a basic docker container
+- fix incomplete plugins removal (in some cases)
+- fix list metwork processes feature for dev usage (several modules as the same user)
+- fix metwork processes list
+- fix missing postinstall scripts
+- raise some timeouts for timeout problems on slow machines
+- remove a debug message during some plugin operations
+- remove a debug message in plugin_wrapper util
+- rollback on plugin packaging around virtualenv
 
-### Features
+### BREAKING CHANGE
 
-* Add a "plugin succesfully created message" ([8e86e1f](https://github.com/metwork-framework/mfcom/commit/8e86e1f)), closes [#66](https://github.com/metwork-framework/mfcom/issues/66)
-* add a list_metwork_processes util ([9b6745b](https://github.com/metwork-framework/mfcom/commit/9b6745b)), closes [metwork-framework/resources#22](https://github.com/metwork-framework/resources/issues/22)
-* add a no-input option ([a21a8d3](https://github.com/metwork-framework/mfcom/commit/a21a8d3))
-* add a telegraf plugin to collect informations about metwork ([f39626f](https://github.com/metwork-framework/mfcom/commit/f39626f)), closes [metwork-framework/resources#22](https://github.com/metwork-framework/resources/issues/22)
-* add get_file_size function in synutil_lua ([8143d08](https://github.com/metwork-framework/mfcom/commit/8143d08))
-* add home to plugins.list --json output ([4b4f166](https://github.com/metwork-framework/mfcom/commit/4b4f166))
-* add new layerapi2 python wrapper ([9e23b59](https://github.com/metwork-framework/mfcom/commit/9e23b59))
-* better plugin build ([24a484d](https://github.com/metwork-framework/mfcom/commit/24a484d))
-* better plugin cleaning (again) ([8c84417](https://github.com/metwork-framework/mfcom/commit/8c84417))
-* better plugin management (with errors in pre/post scripts) ([8944a95](https://github.com/metwork-framework/mfcom/commit/8944a95))
-* introduce new autorestart plugin ([ee829f8](https://github.com/metwork-framework/mfcom/commit/ee829f8)), closes [#82](https://github.com/metwork-framework/mfcom/issues/82)
-* new plugin_wrapper (with options) ([0272488](https://github.com/metwork-framework/mfcom/commit/0272488)), closes [metwork-framework/resources#24](https://github.com/metwork-framework/resources/issues/24)
-* publish conf generation time as an env var ([ca04ab2](https://github.com/metwork-framework/mfcom/commit/ca04ab2)), closes [metwork-framework/resources#10](https://github.com/metwork-framework/resources/issues/10)
-* refactor node plugins build ([3782494](https://github.com/metwork-framework/mfcom/commit/3782494)), closes [#69](https://github.com/metwork-framework/mfcom/issues/69)
-* remove virtualenv sources after .plugin install ([08e6203](https://github.com/metwork-framework/mfcom/commit/08e6203))
-
-
-### BREAKING CHANGES
-
-* node_package.json must be renamed in
-node_sources/package.json and node_package-lock.json must be renamed in
-node_sources/node_package-lock.json
-* _plugins.postuninstall is renamed to
+_plugins.postuninstall is renamed to
 _plugins.preuninstall
-
-
 
