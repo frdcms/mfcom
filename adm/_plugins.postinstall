@@ -36,5 +36,5 @@ fi
 
 if test -x "${PLUGIN_HOME}/postinstall"; then
     echo "Running post-installation plugin tasks"
-    plugin_wrapper ${NAME} ${PLUGIN_HOME}/postinstall
+    plugin_wrapper "${NAME}" "${PLUGIN_HOME}/postinstall"
 fi
