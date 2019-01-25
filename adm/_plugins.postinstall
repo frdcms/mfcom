@@ -33,3 +33,8 @@ if ! test -L "${PLUGIN_HOME}"; then
     rm -Rf "${PLUGIN_HOME}/python2_virtualenv_sources"
     rm -Rf "${PLUGIN_HOME}/node_sources"
 fi
+
+if test -x "${PLUGIN_HOME}/postinstall"; then
+    echo "Running post-installation plugin tasks"
+    plugin_wrapper "${NAME}" "${PLUGIN_HOME}/postinstall"
+fi

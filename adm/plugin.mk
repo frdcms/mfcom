@@ -1,3 +1,5 @@
+.PHONY: freeze
+
 NAME:=$(shell config.py config.ini general name)
 VERSION:=$(shell config.py config.ini general version |sed "s/{{MODULE_VERSION}}/$${MODULE_VERSION}/g")
 RELEASE:=1
@@ -29,8 +31,8 @@ ifneq ("$(REQUIREMENTS2)","")
 	DEPLOY+=local/lib/python$(PYTHON2_SHORT_VERSION)/site-packages/requirements2.txt
 endif
 ifneq ("$(wildcard node_sources/package.json)","")
-	PREREQ+=node_sources/package-lock.json
-	DEPLOY+=local/lib/package-lock.json
+	PREREQ+=node_sources/node_modules
+	DEPLOY+=local/lib/node_modules
 endif
 LAYERS=$(shell cat .layerapi2_dependencies |tr '\n' ',' |sed 's/,$$/\n/')
 
@@ -43,16 +45,14 @@ all: $(PREREQ) custom $(DEPLOY)
 	cp -f $(MFCOM_HOME)/share/plugin_autorestart_excludes $@
 
 clean::
-	rm -Rf local *.plugin *.tar.gz python?_virtualenv_sources/*.tmp python?_virtualenv_sources/src python?_virtualenv_sources/freezed_requirements.* python?_virtualenv_sources/tempolayer* tmp_build
+	rm -Rf local *.plugin *.tar.gz python?_virtualenv_sources/*.tmp python?_virtualenv_sources/src python?_virtualenv_sources/freezed_requirements.* python?_virtualenv_sources/tempolayer* tmp_build node_sources/node_modules
 	find . -type d -name "__pycache__" -exec rm -Rf {} \; >/dev/null 2>&1 || true
 
 custom::
 	@echo "override me" >/dev/null
 
 superclean: clean
-	rm -Rf python?_virtualenv_sources/requirements?.txt python?_virtualenv_sources/prerequirements?.txt node_sources/package-lock.json node_sources/node_modules
-
-freeze: superclean $(REQUIREMENTS3) $(REQUIREMENTS2) $(NODE_LOCK)
+	rm -Rf python?_virtualenv_sources/requirements?.txt python?_virtualenv_sources/prerequirements?.txt node_sources/package-lock.json
 
 local/lib/python$(PYTHON3_SHORT_VERSION)/site-packages/requirements3.txt: $(REQUIREMENTS3) python3_virtualenv_sources/src
 	_install_plugin_virtualenv $(NAME) $(VERSION) $(RELEASE)
@@ -98,14 +98,20 @@ release: clean $(PREREQ) custom
 develop: $(PREREQ) custom $(DEPLOY)
 	_plugins.develop $(NAME)
 
-local/lib/package-lock.json: node_sources/package-lock.json node_sources/package.json
+local/lib/node_modules: local/lib/package.json local/lib/package-lock.json node_sources/node_modules
 	mkdir -p local/lib
 	rm -Rf local/lib/node_modules
-	cp -f node_sources/package.json local/lib/package.json
-	cp -f node_sources/package-lock.json local/lib/package-lock.json
-	if test -d node_sources/node_modules; then cp -Rf node_sources/node_modules local/lib/; fi
+	cp -Rf node_sources/node_modules local/lib/
 	# to force an autorestart
 	touch config.ini
+
+local/lib/package.json: node_sources/package.json
+	mkdir -p local/lib
+	cp -f $< $@
+
+local/lib/package-lock.json: node_sources/package-lock.json
+	mkdir -p local/lib
+	cp -f $< $@
 
 node_sources/package-lock.json: node_sources/package.json
 	rm -Rf tmp_build
@@ -113,6 +119,19 @@ node_sources/package-lock.json: node_sources/package.json
 	cp $< tmp_build/package.json
 	cd tmp_build && layer_wrapper --empty --layers=$(LAYERS) -- npm install
 	cp -f tmp_build/package-lock.json $@
-	rm -Rf node_sources/node_modules
-	if test -d tmp_build/node_modules; then cp -Rf tmp_build/node_modules node_sources/; fi
+
+node_sources/node_modules: node_sources/package-lock.json node_sources/package.json
 	rm -Rf tmp_build
+	mkdir -p tmp_build
+	cp $^ tmp_build/
+	cd tmp_build && layer_wrapper --empty --layers=$(LAYERS) -- npm ci install
+	rm -Rf $@
+	if test -d tmp_build/node_modules; then cp -Rf tmp_build/node_modules node_sources/; else mkdir $@; fi
+	rm -Rf tmp_build
+
+freeze:
+	if test -d local/lib/node_modules; then rm -Rf node_sources/node_modules; cp -Rf local/lib/node_modules node_sources/; fi
+	if test local/lib/package-lock.json; then cp -f local/lib/package-lock.json node_sources/package-lock.json; fi
+	if test local/lib/package.json; then cp -f local/lib/package.json node_sources/package.json; fi
+	if local/lib/python$(PYTHON3_SHORT_VERSION)/site-packages/requirements3.txt; then echo "ERROR: freeze command is not implemented for python plugins"; fi
+	if local/lib/python$(PYTHON2_SHORT_VERSION)/site-packages/requirements2.txt; then echo "ERROR: freeze command is not implemented for python plugins"; fi
