@@ -337,13 +337,13 @@ def develop_plugin(plugin_path, name, plugins_base_dir=None,
                    ignore_errors=False, quiet=False):
     plugin_path = os.path.abspath(plugin_path)
     plugins_base_dir = _get_plugins_base_dir(plugins_base_dir)
-    installed_infos = get_plugin_info(name, mode="name",
-                                      plugins_base_dir=plugins_base_dir)
-    if installed_infos is not None:
-        raise MFUtilPluginAlreadyInstalled("plugin %s already installed" %
-                                           name)
     shutil.rmtree(os.path.join(plugins_base_dir, name), True)
-    os.symlink(plugin_path, os.path.join(plugins_base_dir, name))
+    try:
+        os.symlink(plugin_path, os.path.join(plugins_base_dir, name))
+    except OSError:
+        if not quiet:
+            __get_logger().warning(
+                "plugin '%s' already installed as a symlink", name)
     postinstall_status = _postinstall_plugin(name, "dev_link", "dev_link",
                                              quiet=quiet)
     if not postinstall_status and not ignore_errors:
